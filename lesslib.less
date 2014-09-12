@@ -1,0 +1,415 @@
+/*---------------------------------------------------
+  LessLib - library of useful mixins for LESS
+  version: 1.0.0
+  More info here: https://github.com/kopach/lesslib
+---------------------------------------------------*/
+
+//Available directions for gradient:
+//
+// 'top'
+// 'bottom'
+// 'left'
+// 'right'
+// 'top left' / 'left top'
+// 'top right' /'right top'
+// 'bottom left'/ 'left bottom'
+// 'bottom right' /'right bottom'
+//
+.gradient( @start: gray, @end: lighten(@start, 50%), @to: 'bottom', @default: @start + ( @end - @start ) / 2 ) {
+  background: @default; // Middle color between @start and @end
+
+  @old-webkit-from: ~`(function ( d ){
+      switch ( d ){
+        case 'top':
+          return 'left bottom';
+        case 'left':
+          return 'right top';
+        case 'bottom':
+          return 'left top';
+        case 'right':
+          return 'left top';
+        case 'top left':
+        case 'left top':
+          return 'right bottom';
+        case 'top right':
+        case 'right top':
+          return 'left bottom';
+        case 'bottom left':
+        case 'left bottom':
+          return 'right top';
+        case 'bottom right':
+        case 'right bottom':
+          return 'left top';
+        default:
+          return 'left bottom';
+      }
+    })( @{to} )`;
+
+  @old-webkit-to: ~`(function ( d ){
+      switch ( d ){
+        case 'top':
+          return 'left top';
+        case 'left':
+          return 'left top';
+        case 'bottom':
+          return 'left bottom';
+        case 'right':
+          return 'right top';
+        case 'top left':
+        case 'left top':
+          return 'left top';
+        case 'top right':
+        case 'right top':
+          return 'right top';
+        case 'bottom left':
+        case 'left bottom':
+          return 'left bottom';
+        case 'bottom right':
+        case 'right bottom':
+          return 'right bottom';
+        default:
+          return 'left top';
+      }
+    })( @{to} )`;
+
+  background: -webkit-gradient(linear, @old-webkit-from, @old-webkit-to, color-stop(0%, @start), color-stop(100%, @end)); //Safari 4+ and Chrome (aka "Old WebKit")
+
+  @from: ~`(function ( d ){
+      switch ( d ){
+        case 'top':
+          return 'bottom';
+        case 'left':
+          return 'right';
+        case 'bottom':
+          return 'top';
+        case 'right':
+          return 'left';
+        case 'top left':
+        case 'left top':
+          return 'right bottom';
+        case 'top right':
+        case 'right top':
+          return 'left bottom';
+        case 'bottom left':
+        case 'left bottom':
+          return 'right top';
+        case 'bottom right':
+        case 'right bottom':
+          return 'left top';
+        default:
+          return 'bottom';
+      }
+    })( @{to} )`;
+
+  background: -webkit-linear-gradient(@from, @start 0%, @end 100%);  //Safari 5+ and Chrome
+  background:    -moz-linear-gradient(@from, @start 0%, @end 100%);  //Firefox 3.6+
+  background:     -ms-linear-gradient(@from, @start 0%, @end 100%);  //IE 10+
+  background:      -o-linear-gradient(@from, @start 0%, @end 100%);  //Opera 11.10+
+
+  //IE 8+
+  //available directions: 0=Vertical (from top to bottom), 1=Horizontal(from left to right)
+  @ie-direction: ~`(function ( d ){
+      switch ( d ){
+        case 'top':
+        case 'bottom':
+        case 'top left':
+        case 'left top':
+        case 'top right':
+        case 'right top':
+        case 'bottom left':
+        case 'left bottom':
+        case 'bottom right':
+        case 'right bottom':
+          return 0; //0=Vertical
+        case 'left':
+        case 'right':
+          return 1; //1=Horizontal
+        default:
+          return 1;
+      }
+    })( @{to} )`;
+
+    @ie-start: @start;
+    @ie-end: @end;
+
+  @ie-start: ~`(function ( d, s, e ){
+      switch ( d ){
+        case 'top':
+        case 'top left':
+        case 'left top':
+        case 'top right':
+        case 'right top':
+          return e;
+        case 'bottom':
+        case 'bottom left':
+        case 'left bottom':
+        case 'bottom right':
+        case 'right bottom':
+          return s;
+        case 'left':
+          return e;
+        case 'right':
+          return s;
+        default:
+          return s;
+      }
+    })( @{to}, '@{start}', '@{end}' )`;
+
+  @ie-end: ~`(function ( d, s, e ){
+      switch ( d ){
+        case 'top':
+        case 'top left':
+        case 'left top':
+        case 'top right':
+        case 'right top':
+          return s;
+        case 'bottom':
+        case 'bottom left':
+        case 'left bottom':
+        case 'bottom right':
+        case 'right bottom':
+          return e;
+        case 'left':
+          return s;
+        case 'right':
+          return e;
+        default:
+          return e;
+      }
+    })( @{to}, '@{start}', '@{end}' )`;
+
+  -ms-filter: e( "progid:DXImageTransform.Microsoft.gradient(startColorstr='@{ie-start}', endColorstr='@{ie-end}', GradientType=@{ie-direction})" ); //IE8+
+      filter: e( "progid:DXImageTransform.Microsoft.gradient(startColorstr='@{ie-start}', endColorstr='@{ie-end}', GradientType=@{ie-direction})" ); //IE6+
+}
+
+.border-radius( @top-left-radius: 5px, @top-right-radius: ~'', @bottom-right-radius: ~'', @bottom-left-radius: @top-right-radius ) {
+  -webkit-border-radius: @arguments; //Safari 3-4, iOS 1-3.2, Android 1.6-
+     -moz-border-radius: @arguments; //Firefox 1-3.6
+          border-radius: @arguments; //Opera 10.5, IE 9, Safari 5, Chrome, Firefox 4, iOS 4, Android 2.1+
+
+  //For some stock browser on Android, more - http://caniuse.com/#feat=border-radius
+  border-top-left-radius:        @top-left-radius;
+  border-top-right-radius:    ~`'@{top-right-radius}'    || '@{top-left-radius}'`;
+  border-bottom-right-radius: ~`'@{bottom-right-radius}' || '@{top-left-radius}'`;
+  border-bottom-left-radius:  ~`'@{bottom-left-radius}'  || '@{top-right-radius}'  || ' @{top-left-radius}'`;
+
+  // Prevent background color leak outs
+  .background-clip;
+}
+
+.background-clip( @type: padding-box ) {
+  -webkit-background-clip: @type;
+     -moz-background-clip: @type;
+          background-clip: @type;
+}
+
+.circle( @diameter ){
+  .size( @diameter );
+  .border-radius( 50% );
+}
+
+.size( @width, @height: @width ){
+  width: @width;
+  height: @height;
+}
+
+.box-sizing (@type: border-box) {
+  -webkit-box-sizing:  @type;
+     -moz-box-sizing:  @type;
+      -ms-box-sizing:  @type;
+          box-sizing:  @type;
+}
+
+// Use this to create custom or/and multiple shadows
+.box-shadow(...){
+  -webkit-box-shadow: @arguments;
+     -moz-box-shadow: @arguments;
+          box-shadow: @arguments;
+}
+
+.shadow( @x: 0px, @y: @x, @blur: @x * 2, @spread: ~'', @color: black, @alpha: 1, @style: ~'' ) {
+  .box-shadow( @style @x @y @blur @spread rgba(red(@color), green(@color), blue(@color), @alpha) );
+}
+
+// Arguments are same as in .box-shadow() mixin
+.inner-shadow(...) {
+  .shadow( @style: inset, @arguments )
+}
+
+.text-shadow( @x: 0px, @y: @x, @blur: @x * 2, @color: black, @alpha: 1 ) {
+  text-shadow: @x @y @blur rgba(red(@color), green(@color), blue(@color), @alpha);
+}
+
+.opacity(@opacity) {
+  -webkit-opacity: @opacity;
+   -khtml-opacity: @opacity;
+     -moz-opacity: @opacity;
+          opacity: @opacity;
+
+  -ms-filter: e(%("progid:DXImageTransform.Microsoft.Alpha(opacity=%d)", @opacity * 100 )); //IE 8
+      filter: e(%("alpha(opacity=%d)", @opacity * 100 )); //IE 5-7
+}
+
+.user-select(...) {
+  -webkit-user-select: @arguments;
+     -moz-user-select: @arguments;
+      -ms-user-select: @arguments;
+          user-select: @arguments;
+}
+
+.selectNone() {
+  -webkit-touch-callout: none;
+  .user-select(none);
+}
+
+.transform-origin( @x, @y: ~'', @z: ~'' ) {
+  -webkit-transform-origin: @x @y @z;
+     -moz-transform-origin: @x @y @z;
+      -ms-transform-origin: @x @y @z;
+       -o-transform-origin: @x @y @z;
+          transform-origin: @x @y @z;
+}
+
+.transform( @type, @value, ... ) {
+  @transformFunction: ~`(function( arguments ){
+      arguments = arguments.replace(/\s/g, ''); //remove all spaces
+      var parameters = arguments.slice(1,-1)//remove '[' and ']'
+                                .split(',');
+      var transformFunction = '';
+
+      for(var i = 0; i < parameters.length; i++){
+        switch( parameters[i] ){
+          case 'matrix':
+            transformFunction += ' matrix(' + parameters[++i] + ')';
+            break;
+          case 'rotate':
+            transformFunction += ' rotate(' + parameters[++i] + ')';
+            break;
+          case 'scale':
+            transformFunction += ' scale(' + parameters[++i] + ')';
+            break;
+          case 'scaleX':
+            transformFunction += ' scaleX(' + parameters[++i] + ')';
+            break;
+          case 'scaleY':
+            transformFunction += ' scaleY(' + parameters[++i] + ')';
+            break;
+          case 'skewX':
+            transformFunction += ' skewX(' + parameters[++i] + ')';
+            break;
+          case 'skewY':
+            transformFunction += ' skewY(' + parameters[++i] + ')';
+            break;
+          case 'translate':
+            ______use_translateX_and_translateY_instead_of_translate______; //throwing error
+          case 'translateX':
+            transformFunction += ' translateX(' + parameters[++i] + ')';
+            break;
+          case 'translateY':
+            transformFunction += ' translateY(' + parameters[++i] + ')';
+            break;
+        }
+      }
+
+      return transformFunction;
+    })('@{arguments}')`;
+
+  -webkit-transform: @transformFunction;
+     -moz-transform: @transformFunction;
+      -ms-transform: @transformFunction;
+       -o-transform: @transformFunction;
+          transform: @transformFunction;
+}
+
+.flipH() {
+  .transform(scaleX, -1);
+}
+
+.flipV(){
+  .transform(scaleY, -1);
+}
+
+.transition( @property: all, @duration: 0.2s, @timingFunction: ease-out, @delay: ~'' ) {
+  -webkit-transition: @property @duration @timingFunction @delay;
+     -moz-transition: @property @duration @timingFunction @delay;
+       -o-transition: @property @duration @timingFunction @delay;
+          transition: @property @duration @timingFunction @delay;
+}
+
+// @transition parameter should be a string
+.multi-transition( @transition ) when ( isstring(@transition) ){
+  -webkit-transition: ~'@{transition}';
+     -moz-transition: ~'@{transition}';
+       -o-transition: ~'@{transition}';
+          transition: ~'@{transition}';
+}
+
+.transition-property( @property: all ){
+  -webkit-transition-property: @property;
+     -moz-transition-property: @property;
+       -o-transition-property: @property;
+          transition-property: @property;
+}
+
+.transition-duration( @duration: 0.2s ){
+  -webkit-transition-duration: @duration;
+     -moz-transition-duration: @duration;
+       -o-transition-duration: @duration;
+          transition-duration: @duration;
+}
+
+.transition-timing-function( @timing-function: ease-out ){
+  -webkit-transition-timing-function: @timing-function;
+     -moz-transition-timing-function: @timing-function;
+       -o-transition-timing-function: @timing-function;
+          transition-timing-function: @timing-function;
+}
+
+.transition-delay( @delay ){
+  -webkit-transition-delay: @delay;
+     -moz-transition-delay: @delay;
+       -o-transition-delay: @delay;
+          transition-delay: @delay;
+}
+
+.columns(...){
+  -webkit-columns: @arguments;
+     -moz-columns: @arguments;
+          columns: @arguments;
+}
+
+.column-width( @width ){
+  -webkit-column-width: @width;
+     -moz-column-width: @width;
+          column-width: @width;
+}
+
+.column-count( @count ){
+  -webkit-column-count: @count;
+     -moz-column-count: @count;
+          column-count: @count;
+}
+
+.column-gap( @gap ){
+  -webkit-column-gap: @gap;
+     -moz-column-gap: @gap;
+          column-gap: @gap;
+}
+
+.column-rule-color( @ruleColor ){
+  -webkit-column-rule-color: @ruleColor;
+     -moz-column-rule-color: @ruleColor;
+          column-rule-color: @ruleColor;
+}
+
+.column-rule-style( @ruleStyle ){
+  -webkit-column-rule-style: @ruleStyle;
+     -moz-column-rule-style: @ruleStyle;
+          column-rule-style: @ruleStyle;
+}
+
+.column-rule-width( @ruleWidth ){
+  -webkit-column-rule-width: @ruleWidth;
+     -moz-column-rule-width: @ruleWidth;
+          column-rule-width: @ruleWidth;
+}
