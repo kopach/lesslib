@@ -1,0 +1,20 @@
+{
+  "name": "LessLib",
+  "description": "The library of useful mixins for LESS",
+  "license": "MIT",
+  "authors": [
+    "Igor Kopach"
+  ],
+  "homepage": "https://github.com/kopach/lesslib",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kopach/lesslib.git"
+  },
+  "main": [
+    "./lesslib.less"
+  ],
+  "keywords": [
+    "less",
+    "lesslib"
+  ]
+}
