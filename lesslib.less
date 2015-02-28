@@ -1,6 +1,6 @@
 /*---------------------------------------------------
   LessLib - library of useful mixins for LESS
-  version: 1.0.0
+  version: 1.1.0
   More info here: https://github.com/kopach/lesslib
 ---------------------------------------------------*/
 
@@ -412,4 +412,24 @@
   -webkit-column-rule-width: @ruleWidth;
      -moz-column-rule-width: @ruleWidth;
           column-rule-width: @ruleWidth;
+}
+
+// To use this mixin, images in sprite should be with similar dimentions
+//
+// Arguments
+// @i index of image in sprite (from 1 to @x * @y)
+// @x amount of images in x axis
+// @y amount of images in y axis
+.sprite(@i, @x, @y, @img){
+  background-image: url(@img);
+  background-repeat: no-repeat;
+  background-size:
+    100% * @x  // width
+    100% * @y; // height
+
+  @index-x: ~`@{x} <= 1 ? 1 : @{i} - Math.floor(@{i}/@{x}) * @{x}`;
+  @index-y: ~`@{y} <= 1 ? 1 : @{i} - Math.floor(@{i}/@{y}) * @{y}`;
+  background-position:
+    unit(~`@{x} <= 1 ? 0 : 100 / (@{x} - 1) * (@{index-x} - 1)`, %)  // x
+    unit(~`@{y} <= 1 ? 0 : 100 / (@{y} - 1) * (@{index-y} - 1)`, %); // y
 }
